@@ -1,0 +1,69 @@
+.row {
+  display: flex;
+  flex-flow: row nowrap;
+  min-height: 1.5rem;
+  justify-items: start;
+  align-items: center;
+  background-color: rgb(160, 193, 223);
+  padding: 5px;
+  border: 1px solid black;
+}
+
+.itemFirstName,
+.itemLastName,
+.itemAddress,
+.itemBirthdate,
+.itemActions {
+  justify-self: start;
+  align-self: center;
+  padding-right: 5px;
+}
+
+.itemFirstName {
+  flex: 0 0 100px;
+  max-width: 95px;
+}
+
+.itemLastName {
+  flex: 0 0 150px;
+  max-width: 145px;
+}
+
+.itemAddress {
+  flex: 1 1 300px;
+}
+
+.itemBirthdate {
+  flex: 0 0 150px;
+  max-width: 145px;
+}
+
+.itemAction {
+  flex: 0 0 70px;
+}
+
+.iconCheck,
+.iconCancel {
+  margin: 0 7px;
+}
+
+.iconCheck:hover,
+.iconCancel:hover {
+  cursor: pointer;
+  transform: scale(1.3);
+  transition: transform 0.3s;
+}
+
+.iconCheck:hover {
+  color: green;
+}
+
+.iconCancel:hover {
+  color: red;
+}
+
+.row input {
+  box-sizing: border-box;
+  max-width: inherit;
+  width: fit-content;
+}

@@ -1,0 +1,6 @@
+.containerStaff {
+    margin: 10px auto;
+    display: grid;
+    width: 75%;
+    min-width: 770px;
+}
