@@ -3,13 +3,22 @@ import { useState } from 'react'
 import styles from './EmployeeEditable.module.css'
 
 function EmployeeEditable(props) {
-  const { staffItem, setEditable } = props.props
+  const updateEmployeePath = 'http://127.0.0.1:8000/update/'
+  const {
+    staffItem,
+    setIsEditable,
+    setPathAndEmployee,
+    setEditedData,
+    editedData,
+  } = props
 
   const [employeeData, setEmployeeData] = useState(staffItem.employee)
 
   const inputEmployeeHandler = (nameField, text) => {
-    setEmployeeData({ ...employeeData.employee, [nameField]: text })
+    setEmployeeData({ ...employeeData, [nameField]: text })
   }
+
+  // setEditedData(null, staffItem.employee)
 
   return (
     <div className={styles.row}>
@@ -42,12 +51,16 @@ function EmployeeEditable(props) {
         <FaCheck
           className={styles.iconCheck}
           onClick={() => {
-            setEditable(staffItem.employee, false)
+            const fullPath = updateEmployeePath + staffItem.employee.staff_id
+            setIsEditable(false)
+            setPathAndEmployee({ path: fullPath, employee: employeeData })
           }}
         />
         <FaXmark
           className={styles.iconCancel}
-          onClick={() => setEditable(staffItem.employee, false)}
+          onClick={() => {
+            setIsEditable(false)
+          }}
         />
       </div>
     </div>

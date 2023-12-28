@@ -7,19 +7,24 @@ import ModalTrue from './components/UI/ModalTrue'
 import FormAdd from './components/UI/FormAdd'
 
 const employeeEmpty = {
-    first_name: '',
-    last_name: '',
-    address: '',
-    birthdate: '',
+  first_name: '',
+  last_name: '',
+  address: '',
+  birthdate: '',
 }
 
 function App() {
-  // const [employee, setEmployee] = useState(null)
+  const [employee, setEmployee] = useState(employeeEmpty)
   const [staff, setStaff] = useState(null)
   // const [isModalActive, setModalActive] = useState(false)
   const [filterData, setFilterData] = useState(employeeEmpty)
-  
+  const [editedData, setEditedData] = useState(employeeEmpty)
+  // const [editableEmployee, setEditableEmployee] = useState()
+  const [dataToServer, setDataToServer] = useState({ path: '', data: null })
+  const [responseStatus, setResponseStatus] = useState(200)
+
   const sortData = useRef({ sortColumn: '', isSortAsc: true })
+  const prevFuncEditable = useRef({key: '', func: () => {}})
 
   // console.log(staff)
 
@@ -30,20 +35,41 @@ function App() {
   //   setModalActive(false)
   // }
 
+  //хук для получения массива сотрудников от сервера (при загрузке страницы и при добавлении, редактировании, удалении сотрудника)
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/get-staff/json')
-      .then((response) => response.json())
-      .then((staff) => {
-        const staffWithAdditionalFields = []
-        staff.map((employee) => {
-          staffWithAdditionalFields.push({
-            employee: employee,
-            isEditable: false,
+    if (responseStatus === 200) {
+      fetch('http://127.0.0.1:8000/get-staff/json')
+        .then((response) => response.json())
+        .then((staff) => {
+          const staffWithAdditionalFields = []
+          staff.map((employee) => {
+            staffWithAdditionalFields.push({
+              employee: employee,
+              isEditable: false,
+            })
           })
+          setStaff(staffWithAdditionalFields)
+          console.log('get staff entry')
         })
-        setStaff(staffWithAdditionalFields)
+    }
+    setResponseStatus(0)
+  }, [responseStatus])
+
+  //хук для добавления, редактирования, удаления сотрудника
+  useEffect(() => {
+    console.log(dataToServer)
+    if (dataToServer.path) {
+      console.log(employee)
+      fetch(dataToServer.path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToServer.employee),
+      }).then((response) => {
+        setResponseStatus(response.status)
+        console.log(response.status)
       })
-  }, [])
+    }
+  }, [dataToServer])
 
   const setEditableHandler = (employee, isEditable) => {
     isEditable
@@ -93,11 +119,18 @@ function App() {
     setFilterData(employeeEmpty)
   }
 
-  // useEffect(() => {
-  //   fetch('http://127.0.0.1:8000/get/1')
-  //     .then((response) => response.json())
-  //     .then((json) => setEmployee(json))
-  // }, [])
+  const setEditedDataHandler = (nameField, newData) => {
+    if (nameField === null) {
+      setEditedData(newData)
+      console.log(editedData)
+    } else {
+      setEditedData({ ...editedData, [nameField]: newData })
+    }
+  }
+
+  const addEmployeeHandler = (newEmployee) => {
+    setEmployee(newEmployee)
+  }
 
   return (
     <div className="App">
@@ -108,10 +141,18 @@ function App() {
         {staff && (
           <>
             <Staff
-              staff={staff.filter((itemStaff) => 
-                itemStaff.employee.first_name.toLowerCase().includes(filterData.first_name.toLowerCase())
-                 && itemStaff.employee.last_name.toLowerCase().includes(filterData.last_name.toLowerCase()) 
-                 && itemStaff.employee.address.toLowerCase().includes(filterData.address.toLowerCase())
+              staff={staff.filter(
+                (itemStaff) =>
+                  itemStaff.employee.first_name
+                    .toLowerCase()
+                    .includes(filterData.first_name.toLowerCase()) &&
+                  itemStaff.employee.last_name
+                    .toLowerCase()
+                    .includes(filterData.last_name.toLowerCase()) &&
+                  itemStaff.employee.address
+                    .toLowerCase()
+                    .includes(filterData.address.toLowerCase()) &&
+                  itemStaff.employee.birthdate.includes(filterData.birthdate)
               )}
               setEditable={setEditableHandler}
               sortStaff={sortStaffHandler}
@@ -119,6 +160,11 @@ function App() {
               setFilter={setFilterDataHandler}
               filterData={filterData}
               refreshFilter={refreshFilterData}
+              addEmployee={addEmployeeHandler}
+              setPathAndEmployee={setDataToServer}
+              setEditedData={setEditedDataHandler}
+              editedData={editedData}
+              prevFuncEditable={prevFuncEditable}
             />
             {/* <Controls openModal={handleModalOpen} /> */}
           </>

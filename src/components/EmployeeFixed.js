@@ -2,7 +2,17 @@ import { FaPencil, FaTrashCan } from 'react-icons/fa6'
 import styles from './EmployeeFixed.module.css'
 
 function EmployeeFixed(props) {
-  const { staffItem, isHeader, setEditable, sortStaff } = props.props
+  const {
+    staffItem,
+    isHeader,
+    setIsEditable,
+    sortStaff,
+    setPathAndEmployee,
+    setEditedData,
+    isEditable,
+    prevFuncEditable
+  } = props
+  const deleteEmployeePath = 'http://127.0.0.1:8000/delete/'
 
   const dateFormat = (dateStr) => {
     let date = new Date(dateStr)
@@ -23,10 +33,21 @@ function EmployeeFixed(props) {
         <FaPencil
           className={styles.iconEdit}
           onClick={() => {
-            setEditable(staffItem.employee, true)
+            console.log(prevFuncEditable.current.func)
+            prevFuncEditable.current.func(false)
+            setIsEditable(true)
+            prevFuncEditable.current.func = setIsEditable
+            console.log(isEditable)
+            console.log(prevFuncEditable)
           }}
         />
-        <FaTrashCan className={styles.iconDelete} />
+        <FaTrashCan
+          className={styles.iconDelete}
+          onClick={() => {
+            const fullPath = deleteEmployeePath + staffItem.employee.staff_id
+            setPathAndEmployee({ path: fullPath, employee: null })
+          }}
+        />
       </div>
     </div>
   )
